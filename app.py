@@ -1,30 +1,60 @@
 from flask import Flask, request, jsonify, render_template
+import pandas as pd
+import random
+import similar_movies
 
 app = Flask(__name__)
 
-defaultPage='/test.html'
+defaultPage='/index.html'
 
-# Örnek film verisi
-films = [
-    {"title": "The Shawshank Redemption", "genre": "Drama", "rating": 9.3},
-    {"title": "The Godfather", "genre": "Crime", "rating": 9.2},
-    {"title": "The Dark Knight", "genre": "Action", "rating": 9.0},
-    {"title": "Pulp Fiction", "genre": "Crime", "rating": 8.9},
-    {"title": "Fight Club", "genre": "Drama", "rating": 8.8}
-]
+
+def en_yuksek_puanli_filmler(csv_dosya, film_sayisi):
+    # CSV dosyasını pandas ile oku
+    df = pd.read_csv(csv_dosya)
+    
+    # 'vote_average' sütununa göre DataFrame'i sırala ve en yüksek puan alan filmleri seç
+    en_yuksek_puanli_filmler = df.sort_values(by='vote_average', ascending=False).head(film_sayisi)
+    
+    return en_yuksek_puanli_filmler
+
 @app.route('/')
-def hello():
-    return render_template(defaultPage)
-# Basit bir film önerme endpoint'i
-@app.route('/recommendations', methods=['POST'])
-def recommend_movies():
-    req_data = request.get_json()
-    genre = req_data['genre']
-    min_rating = float(req_data.get('min_rating', 0))
+def index():
+    # Belirtilen sayıda rastgele filmi seç
+    print('vallaha calisiyom')
+    secilen_filmler = en_yuksek_puanli_filmler('test.csv', 5000)  # Örneğin 5 film seçelim
+    print('vallaha calisiyom')
+    # Seçilen filmlerin bilgilerini içeren bir liste oluştur
+    filmler = []
+    for index, row in secilen_filmler.iterrows():
+        film_bilgisi = {
+            'ad': row['title'],
+            'turu': row['genres'],
+            'puan': row['vote_average']
+        }
+        filmler.append(film_bilgisi)
+    print(filmler)
+    # Seçilen filmlerin bilgilerini HTML içeriği olarak render_template fonksiyonuna ileterek, belirli bir HTML dosyasını kullanabiliriz
+    return render_template('index.html', filmler=filmler)
 
-    recommended_movies = [movie for movie in films if movie['genre'] == genre and movie['rating'] >= min_rating]
 
-    return jsonify(recommended_movies)
+
+
+@app.route('/film_detay/<film_ad>', methods=['GET', 'POST'])
+def film_detay(film_ad):
+    if request.method == 'POST':
+        # Eğer POST isteği yapıldıysa
+        print('POST isteği yapıldı')
+    else:
+        films, scores = similar_movies.get_similar_movies(film_ad)
+
+        # Eğer GET isteği yapıldıysa
+        print('GET isteği yapıldı')
+    print('Selam',films.values)
+    
+    return_val = 'Film Adi:' + film_ad + ' <br>  Benzerleri: ' + ','.join(films.values)
+    return return_val
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)

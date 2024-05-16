@@ -127,31 +127,13 @@
     </div>
 
     <div class="film-container">
-        <a class="film-box drama" href="film_detay.html">
-            <h3>The Shawshank Redemption</h3>
-            <p>Drama</p>
-            <p>9.3</p>
-        </a>
-        <a class="film-box crime" href="film_detay.html">
-            <h3>The Godfather</h3>
-            <p>Crime</p>
-            <p>9.2</p>
-        </a>
-        <a class="film-box action" href="film_detay.html">
-            <h3>The Dark Knight</h3>
-            <p>Action</p>
-            <p>9.0</p>
-        </a>
-        <a class="film-box crime" href="film_detay.html">
-            <h3>Pulp Fiction</h3>
-            <p>Crime</p>
-            <p>8.9</p>
-        </a>
-        <a class="film-box drama" href="film_detay.html">
-            <h3>Fight Club</h3>
-            <p>Drama</p>
-            <p>8.8</p>
-        </a>
+        {% for film in filmler %}
+        <div class="film-box" onclick="window.location.href='/film_detay/{{ film['ad'] }}'">
+            <h3>{{ film['ad'] }}</h3>
+            <p>{{ film['turu'] }}</p>
+            <p>{{ film['puan'] }}</p>
+        </div>
+        {% endfor %}
     </div>
 
     <script>
