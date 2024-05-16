@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-defaultPage='/index.html'
+defaultPage='/test.html'
 
 # Örnek film verisi
 films = [
