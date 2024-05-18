@@ -98,11 +98,26 @@
             width: 200px;
             margin-bottom: 10px;
         }
+
+        .lucky-btn {
+            float: right;
+            padding: 10px 20px;
+            margin: 5px 10px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .lucky-btn:hover {
+            background-color: #e68900;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <a href="#">Ana Sayfa</a>
+        <a href="/">Ana Sayfa</a>
         <div class="dropdown">
             <button class="dropbtn">Tür Seçimi 
                 <i class="fa fa-caret-down"></i>
@@ -124,11 +139,12 @@
             </div>
         </div>
         <input type="text" id="searchInput" onkeyup="searchFilms()" placeholder="Filmleri ara...">
+        <button class="lucky-btn" onclick="feelLucky()">Kendimi Şanslı Hissediyorum</button>
     </div>
 
     <div class="film-container">
         {% for film in filmler %}
-        <div class="film-box" onclick="window.location.href='/film_detay/{{ film['ad'] }}'">
+        <div class="film-box {{ film['turu'].lower() }}" onclick="window.location.href='/film_detay/{{ film['ad'] }}'">
             <h3>{{ film['ad'] }}</h3>
             <p>{{ film['turu'] }}</p>
             <p>{{ film['puan'] }}</p>
@@ -185,6 +201,13 @@
                     filmBoxes[i].style.display = 'none';
                 }
             }
+        }
+
+        function feelLucky() {
+            var filmBoxes = document.getElementsByClassName('film-box');
+            var randomIndex = Math.floor(Math.random() * filmBoxes.length);
+            var randomFilm = filmBoxes[randomIndex];
+            window.location.href = "/film_detay/"+randomFilm.onclick.toString().match(/'\/film_detay\/([^']+)'/)[1];
         }
     </script>
 </body>

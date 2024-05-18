@@ -4,6 +4,47 @@ import random
 import similar_movies
 import json
 
+
+import requests
+from bs4 import BeautifulSoup
+
+import requests
+from PIL import Image
+import requests
+from io import BytesIO
+from collections import Counter
+import time
+
+def dominant_color(url):
+    start=time.time()
+    response = requests.get(url)
+    print("Çalışma Süresi",time.time()-start)
+
+    image = Image.open(BytesIO(response.content))
+    image = image.convert('RGB')
+    pixels = list(image.getdata())
+    pixel_count = Counter(pixels)
+    most_common_pixel = pixel_count.most_common(1)[0][0]
+    print("Çalışma Süresi",time.time()-start)
+    return most_common_pixel
+
+url = 'https://media.themoviedb.org/t/p/original/drw6bZFRP1Yv5LNFW0KLoAgWo5.jpg'
+dominant_rgb = dominant_color(url)
+print(f"En baskın renk (RGB): {dominant_rgb}")
+
+
+def get_movie_image(film_ad):
+    api_key = '9ae4aa8fd098519b71e941c397067bc3'
+
+    # Make the request
+    url = f'https://api.themoviedb.org/3/search/movie?query={film_ad}&api_key={api_key}'
+    response = requests.get(url)
+
+    return "https://media.themoviedb.org/t/p/original"+response.json()['results'][0]['backdrop_path']
+
+print(get_movie_image("godzilla"))
+
+
 app = Flask(__name__)
 using_dataset='tmdb_5000_movies.csv'
 defaultPage='/index.html'
@@ -53,10 +94,9 @@ def film_detay(film_ad):
         # Eğer GET isteği yapıldıysa
         print('GET isteği yapıldı')
     print('Selam',films.values)
-    
-    return_val = 'Film Adi:' + film_ad + ' <br>  Benzerleri: ' + ','.join(films.values)
-    #return return_val
-    return render_template(redirectedPage)
+    image_url = get_movie_image(film_ad)
+    dominant_color_on_html=dominant_color(image_url)
+    return render_template('test.html', similar_movies=films.values , main_movie=film_ad, image_url=image_url,dominant_color="rgb("+str(dominant_color_on_html[0])+" "+str(dominant_color_on_html[1])+" "+str(dominant_color_on_html[2])+" / 50% )")
 
 
 
