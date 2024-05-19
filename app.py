@@ -14,19 +14,22 @@ import requests
 from io import BytesIO
 from collections import Counter
 import time
+import numpy as np
 
 def dominant_color(url):
-    start=time.time()
+    start = time.time()
     response = requests.get(url)
-    print("Çalışma Süresi",time.time()-start)
+    print("Çalışma Süresi:", time.time() - start)
 
     image = Image.open(BytesIO(response.content))
     image = image.convert('RGB')
-    pixels = list(image.getdata())
-    pixel_count = Counter(pixels)
-    most_common_pixel = pixel_count.most_common(1)[0][0]
-    print("Çalışma Süresi",time.time()-start)
-    return most_common_pixel
+
+    # Pixelleri al ve numpy array'e çevir
+    pixels = np.array(image)
+
+    # Piksel ortalamasını hesapla
+    average_color = np.mean(pixels, axis=(0, 1)).astype(int)
+    return average_color
 
 url = 'https://media.themoviedb.org/t/p/original/drw6bZFRP1Yv5LNFW0KLoAgWo5.jpg'
 dominant_rgb = dominant_color(url)
