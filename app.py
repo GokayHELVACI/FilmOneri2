@@ -63,6 +63,19 @@ def en_yuksek_puanli_filmler(csv_dosya, film_sayisi):
     
     return en_yuksek_puanli_filmler
 
+
+@app.route('/search')
+def search():
+    query = request.args.get('query')
+    df = pd.read_csv(using_dataset)
+    if query:
+        # Filmleri arama
+        results = df[df['title'].str.contains(query, case=False, na=False)]
+        results = results.to_dict(orient='records')
+    else:
+        results = []
+    return render_template('index2.html', results=results)
+
 @app.route('/')
 def index():
     # Belirtilen sayıda rastgele filmi seç
