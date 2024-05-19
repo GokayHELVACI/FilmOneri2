@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Film Verileri</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         .film-container {
             display: flex;
@@ -87,7 +86,62 @@
         .dropdown:hover .dropdown-content {
             display: block;
         }
+        #diger{
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Sağ tarafa hizalar */
+            position: fixed; /* Üstte ve ekranda sabit kalır */
+            top: 0; /* Üst kenara yapıştırır */
+            right: 0; /* Sağ kenara yapıştırır */
+            width: 100%; /* Tam genişlik */
+            padding: 10px; /* İç boşluk */
+            z-index: 1000; /* Üstte görünmesini sağlar */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Hafif gölge efekti */
+            
+        }
+        #filmAramaForm {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Sağ tarafa hizalar */
+            position: fixed; /* Üstte ve ekranda sabit kalır */
+            top: 0; /* Üst kenara yapıştırır */
+            right: 0; /* Sağ kenara yapıştırır */
+            width: 50%; /* Tam genişlik */
+            padding: 10px; /* İç boşluk */
+            z-index: 1000; /* Üstte görünmesini sağlar */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Hafif gölge efekti */
+            }
 
+        #filmAd {
+            margin-right: 10px; /* Sağ tarafa boşluk ekler */
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        #filmAraButon {
+            border: 2px solid #7a1414;
+            border-radius: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            width: 200px;
+            cursor: pointer; /* Butonun üzerine gelince imleç değişir */
+        }
+        #luckyBtn{
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 14px 20px;
+            background-color: inherit;
+            font-family: inherit;
+            margin: 0;
+        }
+        /*
         #searchInput {
             margin-top: 5px;
             float: right;
@@ -98,7 +152,7 @@
             border-radius: 5px;
             width: 200px;
             margin-bottom: 10px;
-        }
+        }*/
 
         .lucky-btn {
             float: right;
@@ -136,43 +190,13 @@
     </style>
 </head>
 <body>
-    <div id="searchResults"></div>
+      
     <script>
-        let filmData = [];
-
-        function loadCSV() {
-            Papa.parse('/tmdb_5000_movies.csv', {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    filmData = results.data;
-                }
-            });
-        }
-
-        function searchFilms2() {
-            var input, filter, resultsContainer, i;
-            input = document.getElementById('searchInput');
-            filter = input.value.toUpperCase();
-            resultsContainer = document.getElementById('searchResults');
-            resultsContainer.innerHTML = '';
-
-            for (i = 0; i < filmData.length; i++) {
-                if (filmData[i].ad.toUpperCase().indexOf(filter) > -1) {
-                    var filmBox = document.createElement('div');
-                    filmBox.className = 'film-box';
-                    filmBox.innerHTML = `<h3>${filmData[i].ad}</h3>
-                                         <p>${filmData[i].turu}</p>
-                                         <p>${filmData[i].puan}</p>`;
-                    filmBox.onclick = (function(film) {
-                        return function() {
-                            window.location.href = '/film_detay/' + film.ad;
-                        }
-                    })(filmData[i]);
-                    resultsContainer.appendChild(filmBox);
-                }
+        function ara() {
+            var filmAd = document.getElementById("filmAd");
+            window.location.href = "/film_detay/" + encodeURIComponent(filmAd);
             }
-        }
+        let filmData = [];
 
         function createSuggestionBox() {
             var input = document.getElementById('searchInput');
@@ -236,8 +260,17 @@
                 <a href="#" onclick="sortFilms('desc')">Azalan</a>
             </div>
         </div>
-        <input type="text" id="searchInput" onkeyup="searchFilms()" placeholder="Filmleri ara...">
-        <button class="lucky-btn" onclick="feelLucky()">Kendimi Şanslı Hissediyorum</button>
+        <div class="dropdown">
+            <button class="lucky-btn" id="luckyBtn" onclick="feelLucky()">Kendimi Şanslı Hissediyorum</button>
+        </div>
+        
+        <form id="filmAramaForm">
+            <input type="text" id="filmAd" placeholder="Film adını girin...">
+            <button type="button" id="filmAraButon" onclick="ara()">Ara</button>
+        
+    </form>
+        <!-- <input type="text" id="searchInput" onkeyup="ara()" placeholder="Filmleri ara..."> -->
+        
     </div>
 
     <div class="film-container">
@@ -251,6 +284,11 @@
     </div>
 
     <script>
+        function ara() {
+            var filmAd = document.getElementById("filmAd").value;
+            window.location.href = "/search?query=" + encodeURIComponent(filmAd);
+            }
+
         function filterFilms(genre) {
             var filmBoxes = document.getElementsByClassName("film-box");
             if (genre === 'All') {

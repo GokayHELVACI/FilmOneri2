@@ -74,7 +74,27 @@ def search():
         results = results.to_dict(orient='records')
     else:
         results = []
-    return render_template('index2.html', results=results)
+
+    print(results)
+    
+    # Seçilen filmlerin bilgilerini içeren bir liste oluştur
+    filmler = []
+    for film in results:
+        genres = json.loads(film['genres'])
+        genre_names = [genre['name'] for genre in genres]
+        genre_string = ', '.join(genre_names)
+        film_bilgisi = {
+            'ad': film['title'],
+            'turu': genre_string,
+            'puan': film['vote_average']
+        }
+        filmler.append(film_bilgisi)
+    print(filmler)
+    # Seçilen filmlerin bilgilerini HTML içeriği olarak render_template fonksiyonuna ileterek, belirli bir HTML dosyasını kullanabiliriz
+    return render_template('index.html', filmler=filmler)
+
+
+
 
 @app.route('/')
 def index():
