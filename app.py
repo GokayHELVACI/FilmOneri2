@@ -43,7 +43,8 @@ def get_movie_image(film_ad):
     url = f'https://api.themoviedb.org/3/search/movie?query={film_ad}&api_key={api_key}'
     response = requests.get(url)
 
-    return "https://media.themoviedb.org/t/p/original"+response.json()['results'][0]['backdrop_path']
+    return "https://media.themoviedb.org/t/p/original"+response.json()['results'][0]['poster_path']
+    #return "https://media.themoviedb.org/t/p/original"+response.json()['results'][0]['backdrop_path']
 
 print(get_movie_image("godzilla"))
 

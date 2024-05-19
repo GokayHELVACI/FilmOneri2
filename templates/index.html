@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Film Verileri</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         .film-container {
             display: flex;
@@ -18,8 +19,8 @@
             border-radius: 5px;
             cursor: pointer;
             text-align: center;
-            text-decoration: none; /* Film kutularının mavi olmaması için varsayılan bağlantı stilini kaldırır */
-            color: inherit; /* Film kutularının metin rengini varsayılan yapar */
+            text-decoration: none;
+            color: inherit;
         }
 
         .film-box:hover {
@@ -113,9 +114,106 @@
         .lucky-btn:hover {
             background-color: #e68900;
         }
+
+        /* Autocomplete suggestions box */
+        .autocomplete-suggestions {
+            position: absolute;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .autocomplete-suggestion {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
+    <div id="searchResults"></div>
+    <script>
+        let filmData = [];
+
+        function loadCSV() {
+            Papa.parse('/tmdb_5000_movies.csv', {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    filmData = results.data;
+                }
+            });
+        }
+
+        function searchFilms2() {
+            var input, filter, resultsContainer, i;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+
+            for (i = 0; i < filmData.length; i++) {
+                if (filmData[i].ad.toUpperCase().indexOf(filter) > -1) {
+                    var filmBox = document.createElement('div');
+                    filmBox.className = 'film-box';
+                    filmBox.innerHTML = `<h3>${filmData[i].ad}</h3>
+                                         <p>${filmData[i].turu}</p>
+                                         <p>${filmData[i].puan}</p>`;
+                    filmBox.onclick = (function(film) {
+                        return function() {
+                            window.location.href = '/film_detay/' + film.ad;
+                        }
+                    })(filmData[i]);
+                    resultsContainer.appendChild(filmBox);
+                }
+            }
+        }
+
+        function createSuggestionBox() {
+            var input = document.getElementById('searchInput');
+            var suggestionBox = document.createElement('div');
+            suggestionBox.setAttribute('id', 'suggestionBox');
+            suggestionBox.className = 'autocomplete-suggestions';
+            input.parentNode.appendChild(suggestionBox);
+        }
+
+        function updateSuggestions() {
+            var input, filter, suggestionBox, i;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            suggestionBox = document.getElementById('suggestionBox');
+            suggestionBox.innerHTML = '';
+
+            if (!filter) {
+                return;
+            }
+
+            for (i = 0; i < filmData.length; i++) {
+                if (filmData[i].ad.toUpperCase().indexOf(filter) > -1) {
+                    var suggestion = document.createElement('div');
+                    suggestion.className = 'autocomplete-suggestion';
+                    suggestion.innerText = filmData[i].ad;
+                    suggestion.onclick = (function(film) {
+                        return function() {
+                            window.location.href = '/film_detay/' + film.ad;
+                        }
+                    })(filmData[i]);
+                    suggestionBox.appendChild(suggestion);
+                }
+            }
+        }
+
+        window.onload = function() {
+            loadCSV();
+            createSuggestionBox();
+            document.getElementById('searchInput').addEventListener('input', updateSuggestions);
+        }
+    </script>
     <div class="navbar">
         <a href="/">Ana Sayfa</a>
         <div class="dropdown">
