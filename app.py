@@ -52,7 +52,7 @@ print(get_movie_image("godzilla"))
 app = Flask(__name__)
 using_dataset='tmdb_5000_movies.csv'
 defaultPage='/index.html'
-redirectedPage ='/test.html'
+redirectedPage ='/filmDetay.html'
 
 def en_yuksek_puanli_filmler(csv_dosya, film_sayisi):
     # CSV dosyasını pandas ile oku
@@ -133,7 +133,7 @@ def film_detay(film_ad):
     print('Selam',films.values)
     image_url = get_movie_image(film_ad)
     dominant_color_on_html=dominant_color(image_url)
-    return render_template('test.html', similar_movies=films.values , main_movie=film_ad, image_url=image_url,dominant_color="rgb("+str(dominant_color_on_html[0])+" "+str(dominant_color_on_html[1])+" "+str(dominant_color_on_html[2])+" / 50% )")
+    return render_template('filmDetay.html', similar_movies=films.values , main_movie=film_ad, image_url=image_url,dominant_color="rgb("+str(dominant_color_on_html[0])+" "+str(dominant_color_on_html[1])+" "+str(dominant_color_on_html[2])+" / 50% )")
 
 
 
